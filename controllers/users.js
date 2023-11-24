@@ -1,5 +1,5 @@
 const {generateError} = require("../helpers");
-const{createUser}  = require("../db/users");
+const {createUser, getUserById}  = require("../db/users");
 
 //DEFINIMOS LOS CONTROLADORES DE USUARIOS
 
@@ -17,11 +17,11 @@ const newUserController = async (req, res, next) => {
 
 
         res.send({
-            status: "Ok",
+            status: 'Ok',
             message: `Usuario creado con id: ${id}`,
         });
 
-    } catch(error) {
+    } catch (error) {
         next(error);
     }
 };
@@ -29,14 +29,18 @@ const newUserController = async (req, res, next) => {
 const getUserController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
     try {
+  
+        const { id } = req.params;
+    
+        const user = await getUserById(id);
+    
         res.send({
-            status: "error",
-            message: "No implementado"
+          status: 'Ok',
+          data: user,
         });
-
-    } catch(error) {
+      } catch (error) {
         next(error);
-    }
+      }
 };
 
 

@@ -34,8 +34,8 @@ app.use(morgan("dev"));
 //ASOCIAMOS LOS CONTROLADORES A LAS RUTAS RESPECTIVAS
 //AQUI DEFINIMOS LAS RUTAS DE LOS USUARIOS
 app.post("/user", newUserController );
-app.get("user/:id", getUserController);
-app.post("/login", loginController)
+app.get("/user/:id", getUserController);
+app.post("/login", loginController);
 
 
 //ASOCIAMOS LOS CONTROLADORES A LAS RUTAS RESPECTIVAS
@@ -43,7 +43,7 @@ app.post("/login", loginController)
 app.post("/", newTweetController );
 app.get("/", getTweetsController);
 app.get("/tweet/:id", getSingleTweetController);
-app.delete("/tweet/:id", deleteTweetController)
+app.delete("/tweet/:id", deleteTweetController);
 
 
 //Para error de 404
@@ -58,14 +58,14 @@ app.use((req, res) => {
 //Para gestion de errores de nuestro servidor
 app.use((error, req, res, next) => {
     console.error(error);
-
+  
     res.status(error.httpStatus || 500).send({
-        status: "error",
-        message: error.message,
-    })
-})
+      status: 'error',
+      message: error.message,
+    });
+  });
 
 //Lanzamos el servidor
 app.listen(3000, () => {
     console.log("Servidor funcionando");
-})
+});
