@@ -1,5 +1,7 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const {generateError} = require("../helpers");
-const {createUser, getUserById}  = require("../db/users");
+const {createUser, getUserById, getUserByEmail}  = require("../db/users");
 
 //DEFINIMOS LOS CONTROLADORES DE USUARIOS
 
@@ -47,9 +49,36 @@ const getUserController = async (req, res, next) => {
 const loginController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
     try {
+        const {email, password} = req.body;
+
+        if (!email || !password) {
+            throw generateError("Debes enviar un email y una contraseña", 400);
+        }
+//RECOJO LOS DATOS DE LA BBDD DEL USUARIO CON ESE EMAIL
+        const user = await getUserByEmail(email);
+
+    //COMPRUEBO SI LAS CONTRASEÑAS COINCIDEN
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if(!validPassword) {
+        throw generateError("La contraseña no coincide", 401);
+    }
+    //CREO EL PLAYLOAD DEL TOKEN
+    const payload = { id: user.id };
+
+
+    //FIRMO EL TOKEN
+    const token = jwt.sign(payload, process.env.SECRET, {
+        expiresIn: "30d"
+    });
+
+    //ENVIO EL TOKEN
+
+
+
         res.send({
-            status: "error",
-            message: "No implementado"
+            status: "Ok",
+            data: token,
         });
 
     } catch(error) {
