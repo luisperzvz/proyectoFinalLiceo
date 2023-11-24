@@ -24,6 +24,9 @@ const {
 const app = express();
 
 
+app.use(express.json());
+
+
 //POR AQUI PASAN TODAS LAS PETICIONES
 app.use(morgan("dev"));
 
