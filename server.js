@@ -21,6 +21,8 @@ const {
     deleteTweetController,
 } = require("./controllers/tweets");
 
+const {authUser} = require("./middlewares/auth");
+
 const app = express();
 
 
@@ -40,7 +42,8 @@ app.post("/login", loginController);
 
 //ASOCIAMOS LOS CONTROLADORES A LAS RUTAS RESPECTIVAS
 //AQUI DEFINIMOS LAS RUTAS DE LOS TWEETS
-app.post("/", newTweetController );
+//AUTHUSER COMPRUEBA SI EL TOKEN DEL USUARIO ES CORRECTO PARA PODER PUBLICAR UN TWEET
+app.post("/", authUser, newTweetController );
 app.get("/", getTweetsController);
 app.get("/tweet/:id", getSingleTweetController);
 app.delete("/tweet/:id", deleteTweetController);
