@@ -1,6 +1,30 @@
 const { generateError } = require("../helpers");
 const { getConnection } = require("./db");
 
+const getTweetById = async (id) => {
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+const [result] = await connection.query(`
+        SELECT * FROM tweets WHERE id = ?
+        `, [id]);
+
+        if (result.length === 0) {
+            throw generateError(`El tweet con id: ${id} no existe`, 404);
+        }
+
+        return result[0];
+
+    } finally {
+        if(connection) connection.release();
+    }
+}
+
+
+
+
 
 const getAllTweets = async () => {
     let connection;
@@ -41,4 +65,5 @@ const createTweet = async (userId, text, image = '') => {
 module.exports = {
     createTweet,
     getAllTweets,
+    getTweetById,
 };

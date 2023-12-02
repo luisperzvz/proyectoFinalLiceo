@@ -1,7 +1,7 @@
 //DEFINIMOS LOS CONTROLADORES DE LOS TWEETS
 
 const { generateError } = require("../helpers");
-const {createTweet, getAllTweets} = require('../db/tweets');
+const {createTweet, getAllTweets, getTweetById} = require('../db/tweets');
 
 const getTweetsController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
@@ -46,9 +46,11 @@ const newTweetController = async (req, res, next) => {
 const getSingleTweetController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
     try {
+        const { id } = req.params;
+        const tweet = await getTweetById(id);
         res.send({
-            status: "error",
-            message: "No implementado"
+            status: "Ok",
+            data: tweet,
         });
 
     } catch(error) {
