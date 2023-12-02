@@ -1,7 +1,7 @@
 //DEFINIMOS LOS CONTROLADORES DE LOS TWEETS
 
 const { generateError } = require("../helpers");
-const {createTweet, getAllTweets, getTweetById} = require('../db/tweets');
+const {createTweet, getAllTweets, getTweetById, deleteTweetById,} = require('../db/tweets');
 
 const getTweetsController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
@@ -62,16 +62,34 @@ const getSingleTweetController = async (req, res, next) => {
 
 const deleteTweetController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
-    try {
-        res.send({
-            status: "error",
-            message: "No implementado"
-        });
 
-    } catch(error) {
+    try {
+
+        //req.userId
+        const {id} = req.params;
+    
+        // Conseguir la información del tweet que quiero borrar
+        const tweet = await getTweetById(id);
+    
+        // Comprobar que el usuario del token es el mismo que creó el tweet
+        if (req.userId !== tweet.user_id) {
+          throw generateError(
+            `Estás intentando borrar un tweet que no es tuyo`,
+            401
+          );
+        }
+    
+        // Borrar el tweet
+        await deleteTweetById(id);
+    
+        res.send({
+          status: 'ok',
+          message: `El tweet con id: ${id} fue borrado`,
+        });
+      } catch (error) {
         next(error);
-    }
-};
+      }
+    };
 
 //AQUI LOS EXPORTAMOS
 module.exports = {

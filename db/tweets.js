@@ -1,6 +1,29 @@
 const { generateError } = require("../helpers");
 const { getConnection } = require("./db");
 
+
+const deleteTweetById = async (id) => {
+    let connection;
+  
+    try {
+      connection = await getConnection();
+  
+      await connection.query(
+        `
+        DELETE FROM tweets WHERE id = ?
+      `,
+        [id]
+      );
+  
+      return;
+    } finally {
+      if (connection) connection.release();
+    }
+  };
+
+
+
+
 const getTweetById = async (id) => {
     let connection;
 
@@ -20,7 +43,7 @@ const [result] = await connection.query(`
     } finally {
         if(connection) connection.release();
     }
-}
+};
 
 
 
@@ -41,7 +64,7 @@ const [result] = await connection.query(`
     } finally {
         if(connection) connection.release();
     }
-}
+};
 
 
 const createTweet = async (userId, text, image = '') => {
@@ -66,4 +89,5 @@ module.exports = {
     createTweet,
     getAllTweets,
     getTweetById,
+    deleteTweetById,
 };

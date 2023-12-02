@@ -46,7 +46,7 @@ app.post("/login", loginController);
 app.post("/", authUser, newTweetController );
 app.get("/", getTweetsController);
 app.get("/tweet/:id", getSingleTweetController);
-app.delete("/tweet/:id", deleteTweetController);
+app.delete("/tweet/:id", authUser, deleteTweetController);
 
 
 //Para error de 404
