@@ -64,7 +64,7 @@ const newTweetController = async (req, res, next) => {
   
       res.send({
         status: 'ok',
-        data: tweet,
+        data: tweet, 
       });
     } catch (error) {
       next(error);
@@ -73,20 +73,19 @@ const newTweetController = async (req, res, next) => {
 
 
 
-const getSingleTweetController = async (req, res, next) => {
-    //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
+  const getSingleTweetController = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const tweet = await getTweetById(id);
-        res.send({
-            status: "Ok",
-            data: tweet,
-        });
-
-    } catch(error) {
-        next(error);
+      const { id } = req.params;
+      const tweet = await getTweetById(id);
+  
+      res.send({
+        status: 'ok',
+        data: tweet,
+      });
+    } catch (error) {
+      next(error);
     }
-};
+  };
 
 
 

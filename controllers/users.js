@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {generateError} = require("../helpers");
 const {createUser, getUserById, getUserByEmail}  = require("../db/users");
+const { getTweetsByUserId } = require('../db/tweets');
+
 
 //DEFINIMOS LOS CONTROLADORES DE USUARIOS
 
@@ -86,10 +88,42 @@ const loginController = async (req, res, next) => {
     }
 };
 
+
+const getMeController = async (req, res, next) => {
+  try {
+    const user = await getUserById(req.userId, false);
+
+    res.send({
+      status: 'ok',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const getUserTweetsController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = await getTweetsByUserId(id);
+
+    res.send({
+      status: 'ok',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 //AQUI LOS EXPORTAMOS
 module.exports = {
     newUserController,
     getUserController,
     loginController,
+    getMeController,
+    getUserTweetsController,
 };
 

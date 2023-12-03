@@ -11,6 +11,8 @@ const {
     newUserController,
     getUserController,
     loginController,
+    getUserTweetsController,
+    getMeController,
 } = require("./controllers/users");
 
 
@@ -41,6 +43,8 @@ app.use('/uploads', express.static('./uploads'));
 app.post("/user", newUserController );
 app.get("/user/:id", getUserController);
 app.post("/login", loginController);
+app.get('/user/:id/tweets', getUserTweetsController);
+app.get('/user', authUser, getMeController);
 
 
 //ASOCIAMOS LOS CONTROLADORES A LAS RUTAS RESPECTIVAS
