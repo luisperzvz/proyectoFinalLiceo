@@ -2,6 +2,8 @@ require("dotenv").config();
 
 const express = require("express");
 const morgan = require("morgan");
+const fileUpload = require("express-fileupload");
+const cors = require('cors');
 
 
 //AQUI IMPORTAMOS LOS CONTROLADORES DE LOS USUARIOS
@@ -24,13 +26,14 @@ const {
 const {authUser} = require("./middlewares/auth");
 
 const app = express();
-
-
+app.use(fileUpload());
+app.use(cors());
 app.use(express.json());
 
 
 //POR AQUI PASAN TODAS LAS PETICIONES
 app.use(morgan("dev"));
+app.use('/uploads', express.static('./uploads'));
 
 
 //ASOCIAMOS LOS CONTROLADORES A LAS RUTAS RESPECTIVAS

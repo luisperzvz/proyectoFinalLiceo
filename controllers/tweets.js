@@ -1,7 +1,18 @@
 //DEFINIMOS LOS CONTROLADORES DE LOS TWEETS
 
-const { generateError } = require("../helpers");
-const {createTweet, getAllTweets, getTweetById, deleteTweetById,} = require('../db/tweets');
+const {
+    createTweet,
+    getAllTweets,
+    getTweetById,
+    deleteTweetById,
+  } = require('../db/tweets');
+  const { generateError, createPathIfNotExists } = require('../helpers');
+  const path = require('path');
+  const sharp = require('sharp');
+  const { nanoid } = require('nanoid');
+
+
+
 
 const getTweetsController = async (req, res, next) => {
     //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
@@ -19,27 +30,46 @@ const getTweetsController = async (req, res, next) => {
 
 
 const newTweetController = async (req, res, next) => {
-    //CUALQUIER ERROR QUE SE ENCUENTRE EN EL TRY, PASARÁ AL CATCH, EL CUAL LO REDIGIRÁ A SERVER.JS DONDE SE ENCUENTRAN EL GESTOR DE ERRORES
-    
-
     try {
-
-        const {text} = req.body;
-
-    if(!text || text.length > 280) {
-        throw generateError(`Debes existir un Tweet y tener menos de 280 caracteres`, 400);
+      const { text } = req.body;
+  
+      if (!text || text.length > 280) {
+        throw generateError(
+          'El texto del tweet debe existir y ser menor de 280 caracteres',
+          400
+        );
+      }
+      let imageFileName;
+  
+      if (req.files && req.files.image) {
+        // Creo el path del directorio uploads
+        const uploadsDir = path.join(__dirname, '../uploads');
+  
+        // Creo el directorio si no existe
+        await createPathIfNotExists(uploadsDir);
+  
+        // Procesar la imagen
+        const image = sharp(req.files.image.data);
+        image.resize(500);
+  
+        // Guardo la imagen con un nombre aleatorio en el directorio uploads
+        imageFileName = `${nanoid(24)}.jpg`;
+  
+        await image.toFile(path.join(uploadsDir, imageFileName));
+      }
+  
+      const id = await createTweet(req.userId, text, imageFileName);
+  
+      const tweet = await getTweetById(id);
+  
+      res.send({
+        status: 'ok',
+        data: tweet,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    const id = await createTweet(req.userId, text);
-        res.send({
-            status: "Ok",
-            message: `Tweet con id: ${id} creado correctamente`,
-        });
-
-    } catch(error) {
-        next(error);
-    }
-};
+  };
 
 
 
