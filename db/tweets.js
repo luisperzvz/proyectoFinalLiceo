@@ -31,7 +31,16 @@ const getTweetById = async (id) => {
         connection = await getConnection();
 
 const [result] = await connection.query(`
-        SELECT * FROM tweets WHERE id = ?
+          SELECT
+            t.id,
+            t.user_id,
+            t.text,
+            t.image,
+            t.created_at,
+            u.email
+          FROM tweets t
+          INNER JOIN users u ON u.id = t.user_id
+          WHERE t.id = ?;
         `, [id]);
 
         if (result.length === 0) {

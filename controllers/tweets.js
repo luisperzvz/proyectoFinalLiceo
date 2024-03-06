@@ -1,16 +1,17 @@
 //DEFINIMOS LOS CONTROLADORES DE LOS TWEETS
 
 const {
-    createTweet,
-    getAllTweets,
-    getTweetById,
-    deleteTweetById,
-  } = require('../db/tweets');
-  const { generateError, createPathIfNotExists } = require('../helpers');
-  const path = require('path');
-  const sharp = require('sharp');
-  const { nanoid } = require('nanoid');
-
+  createTweet,
+  getAllTweets,
+  getTweetById,
+  deleteTweetById,
+} = require('../db/tweets');
+const { generateError, createPathIfNotExists } = require('../helpers');
+const path = require('path');
+const sharp = require('sharp');
+const { nanoid } = require('nanoid');
+const { emitEvent } = require('../sockets/socketManager');
+const { createNotificationToOwnerService, createNotificationToFollowersService } = require("./notifications");
 
 
 
@@ -61,6 +62,10 @@ const newTweetController = async (req, res, next) => {
       const id = await createTweet(req.userId, text, imageFileName);
   
       const tweet = await getTweetById(id);
+
+      if (tweet) {
+        await createNotificationToFollowersService(tweet.user_id, tweet.user_id, `${tweet.email} ha creado un nuevo tweet.`, 'NewTweet');
+      }
   
       res.send({
         status: 'ok',
@@ -110,6 +115,8 @@ const deleteTweetController = async (req, res, next) => {
     
         // Borrar el tweet
         await deleteTweetById(id);
+
+        emitEvent("DeleteTweet", id);
     
         res.send({
           status: 'ok',
@@ -120,10 +127,35 @@ const deleteTweetController = async (req, res, next) => {
       }
     };
 
+const reTweetController = async (req, res, next) => {
+  try {
+    const { tweetId } = req.body;
+
+    const tweet = await getTweetById(tweetId);
+
+    const id = await createTweet(req.userId, tweet.text, tweet.image);
+
+    const reTweet = await getTweetById(id);
+
+    if (tweet.user_id !== reTweet.user_id) {
+      await createNotificationToOwnerService(tweet.user_id, reTweet.user_id, `${reTweet.email} ha dado retweet a tu publicación.`, 'NewReTweet');
+      await createNotificationToFollowersService(tweet.user_id, reTweet.user_id, `${reTweet.email} ha dado retweet a la publicación de ${tweet.email}.`, 'NewReTweet');
+    }
+
+    res.send({
+      status: 'ok',
+      data: reTweet, 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 //AQUI LOS EXPORTAMOS
 module.exports = {
-    newTweetController,
-    getSingleTweetController,
-    getTweetsController,
-    deleteTweetController,
+  newTweetController,
+  getSingleTweetController,
+  getTweetsController,
+  deleteTweetController,
+  reTweetController
 };
